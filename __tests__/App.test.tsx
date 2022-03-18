@@ -2,8 +2,9 @@
 
 import React from "react";
 import renderer from "react-test-renderer";
-import App from "../App";
+import { render } from "@testing-library/react-native";
 
+import App from "../App";
 import Home from "../src/screens/Home";
 
 const mockedDispatch = jest.fn();
@@ -21,8 +22,13 @@ jest.mock("@react-navigation/native", () => {
 	};
 });
 
-it("render <Home />", () => {
-	const home = renderer.create(<App />).toJSON();
+it("render <App />", () => {
+	const app = renderer.create(<App />).toJSON();
 	// @ts-ignore
-	expect(home).toMatchSnapshot();
+	expect(app).toMatchSnapshot();
+});
+
+it("renders <Home /> with proper placeholder", () => {
+	const home = render(<Home />);
+	expect(home.getByPlaceholderText("Enter country")).toBeTruthy();
 });
