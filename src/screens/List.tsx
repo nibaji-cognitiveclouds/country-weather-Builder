@@ -1,7 +1,14 @@
 /** @format */
 
 import React from "react";
-import { View, Text, Image, Button, Modal } from "react-native";
+import {
+	View,
+	Text,
+	Image,
+	Button,
+	Modal,
+	ActivityIndicator,
+} from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 
 import http from "../consts/http";
@@ -23,6 +30,7 @@ const List: React.FC<Props> = (props) => {
 	const [countryData, setCountryData] = React.useState<CountriesResponse[]>([]);
 	const [showModal, setShowModal] = React.useState<boolean>(false);
 	const [weatherData, setWeatherdata] = React.useState<WeatherResponse>();
+	const [weatherLoader, setWeatherLoader] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		countries.get(`/name/${text}`).then((response) => {
@@ -31,6 +39,7 @@ const List: React.FC<Props> = (props) => {
 	}, []);
 
 	function getWeather(capital: string) {
+		setWeatherLoader(true);
 		weather
 			.get("", {
 				params: {
@@ -39,6 +48,9 @@ const List: React.FC<Props> = (props) => {
 			})
 			.then((response) => {
 				setWeatherdata(response.data);
+			})
+			.finally(() => {
+				setWeatherLoader(false);
 			});
 	}
 
@@ -46,38 +58,42 @@ const List: React.FC<Props> = (props) => {
 		<View style={HomeStyle.page}>
 			<Modal visible={showModal} animationType="slide">
 				<View style={ListsStyle.modal}>
-					<View style={ListsStyle.listItem}>
-						<View style={ListsStyle.listProps}>
-							<Text style={ListsStyle.listItemPropName}>
-								City :{" "}
-								<Text style={ListsStyle.listItemPropValue}>
-									{weatherData?.location?.name}
+					{weatherLoader ? (
+						<ActivityIndicator />
+					) : (
+						<View style={ListsStyle.listItem}>
+							<View style={ListsStyle.listProps}>
+								<Text style={ListsStyle.listItemPropName}>
+									City :{" "}
+									<Text style={ListsStyle.listItemPropValue}>
+										{weatherData?.location?.name}
+									</Text>
 								</Text>
-							</Text>
-							<Text style={ListsStyle.listItemPropName}>
-								Temperaure :{" "}
-								<Text style={ListsStyle.listItemPropValue}>
-									{weatherData?.current?.temperature}
+								<Text style={ListsStyle.listItemPropName}>
+									Temperaure :{" "}
+									<Text style={ListsStyle.listItemPropValue}>
+										{weatherData?.current?.temperature}
+									</Text>
 								</Text>
-							</Text>
-							<Text style={ListsStyle.listItemPropName}>
-								Wind Speed :{" "}
-								<Text style={ListsStyle.listItemPropValue}>
-									{weatherData?.current?.wind_speed}
+								<Text style={ListsStyle.listItemPropName}>
+									Wind Speed :{" "}
+									<Text style={ListsStyle.listItemPropValue}>
+										{weatherData?.current?.wind_speed}
+									</Text>
 								</Text>
-							</Text>
-							<Text style={ListsStyle.listItemPropName}>
-								Precipitation :{" "}
-								<Text style={ListsStyle.listItemPropValue}>
-									{weatherData?.current?.precip}
+								<Text style={ListsStyle.listItemPropName}>
+									Precipitation :{" "}
+									<Text style={ListsStyle.listItemPropValue}>
+										{weatherData?.current?.precip}
+									</Text>
 								</Text>
-							</Text>
+							</View>
+							<Image
+								source={{ uri: `${weatherData?.current?.weather_icons?.[0]}` }}
+								style={ListsStyle.listImage}
+							/>
 						</View>
-						<Image
-							source={{ uri: `${weatherData?.current?.weather_icons?.[0]}` }}
-							style={ListsStyle.listImage}
-						/>
-					</View>
+					)}
 					<Button
 						title="Close"
 						onPress={() => {
@@ -86,59 +102,63 @@ const List: React.FC<Props> = (props) => {
 					/>
 				</View>
 			</Modal>
-			<FlatList
-				data={countryData}
-				renderItem={({ item }) => {
-					return (
-						<View style={ListsStyle.listItem}>
-							<View style={ListsStyle.listProps}>
-								<Text style={ListsStyle.listItemPropName}>
-									Name :{" "}
-									<Text style={ListsStyle.listItemPropValue}>
-										{item.name.official}
+			{countryData.length > 0 ? (
+				<FlatList
+					data={countryData}
+					renderItem={({ item }) => {
+						return (
+							<View style={ListsStyle.listItem}>
+								<View style={ListsStyle.listProps}>
+									<Text style={ListsStyle.listItemPropName}>
+										Name :{" "}
+										<Text style={ListsStyle.listItemPropValue}>
+											{item.name.official}
+										</Text>
 									</Text>
-								</Text>
-								<Text style={ListsStyle.listItemPropName}>
-									Capital :{" "}
-									<Text style={ListsStyle.listItemPropValue}>
-										{item.capital}
+									<Text style={ListsStyle.listItemPropName}>
+										Capital :{" "}
+										<Text style={ListsStyle.listItemPropValue}>
+											{item.capital}
+										</Text>
 									</Text>
-								</Text>
-								<Text style={ListsStyle.listItemPropName}>
-									Population :{" "}
-									<Text style={ListsStyle.listItemPropValue}>
-										{item.population}
+									<Text style={ListsStyle.listItemPropName}>
+										Population :{" "}
+										<Text style={ListsStyle.listItemPropValue}>
+											{item.population}
+										</Text>
 									</Text>
-								</Text>
-								<Text style={ListsStyle.listItemPropName}>
-									Latitude :{" "}
-									<Text style={ListsStyle.listItemPropValue}>
-										{item.latlng[0]}
+									<Text style={ListsStyle.listItemPropName}>
+										Latitude :{" "}
+										<Text style={ListsStyle.listItemPropValue}>
+											{item.latlng[0]}
+										</Text>
 									</Text>
-								</Text>
-								<Text style={ListsStyle.listItemPropName}>
-									Longitude :{" "}
-									<Text style={ListsStyle.listItemPropValue}>
-										{item.latlng[1]}
+									<Text style={ListsStyle.listItemPropName}>
+										Longitude :{" "}
+										<Text style={ListsStyle.listItemPropValue}>
+											{item.latlng[1]}
+										</Text>
 									</Text>
-								</Text>
 
-								<Button
-									title="Capital Weather"
-									onPress={() => {
-										setShowModal(true);
-										getWeather(item.capital[0]);
-									}}
+									<Button
+										title="Capital Weather"
+										onPress={() => {
+											setShowModal(true);
+											getWeather(item.capital[0]);
+										}}
+									/>
+								</View>
+								<Image
+									source={{ uri: `${item.flags[1]}` }}
+									style={ListsStyle.listImage}
 								/>
 							</View>
-							<Image
-								source={{ uri: `${item.flags[1]}` }}
-								style={ListsStyle.listImage}
-							/>
-						</View>
-					);
-				}}
-			/>
+						);
+					}}
+				/>
+			) : (
+				<ActivityIndicator />
+			)}
 		</View>
 	);
 };
