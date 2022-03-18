@@ -1,13 +1,13 @@
 /** @format */
 
 import React from "react";
-import { View, Text, Image } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { View, Text, Image, Button, Modal } from "react-native";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 
-import countries from "../consts/http";
+import http from "../consts/http";
 import { HomeStyle } from "../styles/home";
 import { ListsStyle } from "../styles/lists";
-import { CountriesResponse } from "../types/reponses";
+import { CountriesResponse, WeatherResponse } from "../types/reponses";
 import { ListParams } from "../types/routes";
 
 type Props = {
@@ -18,8 +18,11 @@ type Props = {
 
 const List: React.FC<Props> = (props) => {
 	const { text } = props?.route?.params;
+	const { countries, weather } = http;
 
 	const [countryData, setCountryData] = React.useState<CountriesResponse[]>([]);
+	const [showModal, setShowModal] = React.useState<boolean>(false);
+	const [weatherData, setWeatherdata] = React.useState<WeatherResponse>();
 
 	React.useEffect(() => {
 		countries.get(`/name/${text}`).then((response) => {
@@ -27,8 +30,62 @@ const List: React.FC<Props> = (props) => {
 		});
 	}, []);
 
+	function getWeather(capital: string) {
+		weather
+			.get("", {
+				params: {
+					query: capital,
+				},
+			})
+			.then((response) => {
+				setWeatherdata(response.data);
+			});
+	}
+
 	return (
 		<View style={HomeStyle.page}>
+			<Modal visible={showModal} animationType="slide">
+				<View style={ListsStyle.modal}>
+					<View style={ListsStyle.listItem}>
+						<View style={ListsStyle.listProps}>
+							<Text style={ListsStyle.listItemPropName}>
+								City :{" "}
+								<Text style={ListsStyle.listItemPropValue}>
+									{weatherData?.location?.name}
+								</Text>
+							</Text>
+							<Text style={ListsStyle.listItemPropName}>
+								Temperaure :{" "}
+								<Text style={ListsStyle.listItemPropValue}>
+									{weatherData?.current?.temperature}
+								</Text>
+							</Text>
+							<Text style={ListsStyle.listItemPropName}>
+								Wind Speed :{" "}
+								<Text style={ListsStyle.listItemPropValue}>
+									{weatherData?.current?.wind_speed}
+								</Text>
+							</Text>
+							<Text style={ListsStyle.listItemPropName}>
+								Precipitation :{" "}
+								<Text style={ListsStyle.listItemPropValue}>
+									{weatherData?.current?.precip}
+								</Text>
+							</Text>
+						</View>
+						<Image
+							source={{ uri: `${weatherData?.current?.weather_icons?.[0]}` }}
+							style={ListsStyle.listImage}
+						/>
+					</View>
+					<Button
+						title="Close"
+						onPress={() => {
+							setShowModal(false);
+						}}
+					/>
+				</View>
+			</Modal>
 			<FlatList
 				data={countryData}
 				renderItem={({ item }) => {
@@ -65,6 +122,14 @@ const List: React.FC<Props> = (props) => {
 										{item.latlng[1]}
 									</Text>
 								</Text>
+
+								<Button
+									title="Capital Weather"
+									onPress={() => {
+										setShowModal(true);
+										getWeather(item.capital[0]);
+									}}
+								/>
 							</View>
 							<Image
 								source={{ uri: `${item.flags[1]}` }}

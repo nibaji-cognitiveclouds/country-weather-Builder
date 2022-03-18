@@ -29,4 +29,5 @@ export const ListsStyle = StyleSheet.create({
 		width: 50,
 		height: 50,
 	},
+	modal: { top: "30%", margin: 20 },
 });

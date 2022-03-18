@@ -9,3 +9,15 @@ export type CountriesResponse = {
 	population: number;
 	flags: string[];
 };
+
+export type WeatherResponse = {
+	location: {
+		name: string;
+	};
+	current: {
+		temperature: number;
+		weather_icons: string[];
+		wind_speed: number;
+		precip: number;
+	};
+};
