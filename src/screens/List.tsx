@@ -28,14 +28,21 @@ const List: React.FC<Props> = (props) => {
 	const { countries, weather } = http;
 
 	const [countryData, setCountryData] = React.useState<CountriesResponse[]>([]);
+	const [countriesError, setCountriesError] = React.useState<boolean>(false);
 	const [showModal, setShowModal] = React.useState<boolean>(false);
 	const [weatherData, setWeatherdata] = React.useState<WeatherResponse>();
+	const [weatherError, setWeatherError] = React.useState<boolean>(false);
 	const [weatherLoader, setWeatherLoader] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		countries.get(`/name/${text}`).then((response) => {
-			setCountryData(response.data);
-		});
+		countries
+			.get(`/name/${text}`)
+			.then((response) => {
+				setCountryData(response.data);
+			})
+			.catch((error) => {
+				setCountriesError(true);
+			});
 	}, []);
 
 	function getWeather(capital: string) {
@@ -49,6 +56,9 @@ const List: React.FC<Props> = (props) => {
 			.then((response) => {
 				setWeatherdata(response.data);
 			})
+			.catch((error) => {
+				setWeatherError(true);
+			})
 			.finally(() => {
 				setWeatherLoader(false);
 			});
@@ -60,6 +70,8 @@ const List: React.FC<Props> = (props) => {
 				<View style={ListsStyle.modal}>
 					{weatherLoader ? (
 						<ActivityIndicator />
+					) : weatherError ? (
+						<Text>Something went wrong. No data found</Text>
 					) : (
 						<View style={ListsStyle.listItem}>
 							<View style={ListsStyle.listProps}>
@@ -102,7 +114,9 @@ const List: React.FC<Props> = (props) => {
 					/>
 				</View>
 			</Modal>
-			{countryData.length > 0 ? (
+			{countriesError ? (
+				<Text>Something Went wrong. No data found!</Text>
+			) : countryData.length > 0 ? (
 				<FlatList
 					data={countryData}
 					renderItem={({ item }) => {
