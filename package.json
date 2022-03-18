@@ -37,6 +37,7 @@
   },
   "private": true,
   "jest": {
+    "testEnvironment": "jsdom",
     "preset": "jest-expo",
     "moduleFileExtensions": [
       "ts",
