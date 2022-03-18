@@ -1,11 +1,12 @@
 /** @format */
 
 import React from "react";
-import renderer from "react-test-renderer";
-import { render } from "@testing-library/react-native";
+import renderer, { act } from "react-test-renderer";
+import { cleanup, render, waitFor } from "@testing-library/react-native";
 
 import App from "../App";
 import Home from "../src/screens/Home";
+import List from "../src/screens/List";
 
 const mockedDispatch = jest.fn();
 
@@ -31,4 +32,19 @@ it("render <App />", () => {
 it("renders <Home /> with proper placeholder", () => {
 	const home = render(<Home />);
 	expect(home.getByPlaceholderText("Enter country")).toBeTruthy();
+});
+
+it("renders <List /> with proper placeholder", () => {
+	// act(() => {
+	const list = render(
+		<List
+			route={{
+				params: {
+					text: "a",
+				},
+			}}
+		/>
+	);
+	//@ts-ignore
+	expect(list.toJSON()?.children?.length).toBe(2);
 });
