@@ -14,14 +14,16 @@ import {
 	Button,
 } from "react-native";
 import { screens } from "../styles/screens";
+import { countriesType, weatherType } from "../types/responses";
+import { listScreenPropsType } from "../types/screens";
 
-const List: FC<any> = (props) => {
-	const [countryData, setCountryData] = useState<{}[]>([]);
+const List: FC<listScreenPropsType> = (props) => {
+	const [countryData, setCountryData] = useState<countriesType[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<boolean>(false);
 	const [showModal, setShowModal] = useState<boolean>(false);
 
-	const [weatherData, setWeatherData] = useState<{}>({});
+	const [weatherData, setWeatherData] = useState<weatherType>();
 
 	useEffect(() => {
 		getCountryData();
@@ -61,7 +63,7 @@ const List: FC<any> = (props) => {
 			<Modal visible={showModal} animationType={"slide"}>
 				<View style={screens.modal}>
 					<Image
-						source={{ uri: `${weatherData?.current?.weather_icons}` }}
+						source={{ uri: `${weatherData?.current?.weather_icons[0]}` }}
 						style={{ height: 100, width: 100 }}
 					/>
 					<Text>Temperature : {weatherData?.current?.temperature} C</Text>
@@ -81,20 +83,20 @@ const List: FC<any> = (props) => {
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						onPress={() => {
-							handlPress(item.capital);
+							handlPress(item?.capital[0]);
 						}}
 					>
 						<View style={screens.item}>
 							<View>
-								<Text>Name : {item.name.common}</Text>
-								<Text>Capital : {item.capital}</Text>
-								<Text>Population : {item.population}</Text>
-								<Text>Latitude : {item.latlng[0]}</Text>
-								<Text>Longitude : {item.latlng[1]}</Text>
+								<Text>Name : {item?.name.common}</Text>
+								<Text>Capital : {item?.capital}</Text>
+								<Text>Population : {item?.population}</Text>
+								<Text>Latitude : {item?.latlng[0]}</Text>
+								<Text>Longitude : {item?.latlng[1]}</Text>
 							</View>
 							<View>
 								<Image
-									source={{ uri: item.flags[1] }}
+									source={{ uri: item?.flags[1] }}
 									style={{ height: 100, width: 100 }}
 								/>
 							</View>
