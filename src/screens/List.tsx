@@ -13,6 +13,7 @@ import {
 	Modal,
 	Button,
 } from "react-native";
+import { screens } from "../styles/screens";
 
 const List: FC<any> = (props) => {
 	const [countryData, setCountryData] = useState<{}[]>([]);
@@ -56,9 +57,9 @@ const List: FC<any> = (props) => {
 	}
 
 	return (
-		<SafeAreaView testID="lists">
+		<SafeAreaView testID="lists" style={screens.container}>
 			<Modal visible={showModal} animationType={"slide"}>
-				<View>
+				<View style={screens.modal}>
 					<Image
 						source={{ uri: `${weatherData?.current?.weather_icons}` }}
 						style={{ height: 100, width: 100 }}
@@ -83,7 +84,7 @@ const List: FC<any> = (props) => {
 							handlPress(item.capital);
 						}}
 					>
-						<View style={{ flexDirection: "row" }}>
+						<View style={screens.item}>
 							<View>
 								<Text>Name : {item.name.common}</Text>
 								<Text>Capital : {item.capital}</Text>
@@ -94,8 +95,6 @@ const List: FC<any> = (props) => {
 							<View>
 								<Image
 									source={{ uri: item.flags[1] }}
-									width={100}
-									height={100}
 									style={{ height: 100, width: 100 }}
 								/>
 							</View>
